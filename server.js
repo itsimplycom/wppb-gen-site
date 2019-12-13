@@ -26,18 +26,19 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const origin = process.cwd() + '/source' + Math.ceil(Math.random() * 1000) + '/';
+const fileHTML = fs.readFileSync('index.html');
+
 app
   .route('/')
   //GET REQUEST DRAW THE HOME PAGE
   .get(function(req, res) {
-    const fileHTML = fs.readFileSync('index.html');
   
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(fileHTML);
   }) // END GET ROUTE
 
   .post(function(req, res) {
-    var origin = process.cwd() + '/source/';
     var pluginSlug = '';
     var pluginName = '';
     var pluginURI = '';
@@ -48,7 +49,7 @@ app
     var pluginNameInstance = '';
     var pluginAuthorEmail = '';
     var pluginAuthorFull = '';
-    var pluginNameVersion = '';
+    var pluginNameUppercase = '';
     var destination = '';
     var data = req.body;
     // var visitor = ua('UA-56742268-1');
@@ -74,7 +75,7 @@ app
       : 'my@email.tld';
     pluginNamePackage = capitalize(pluginSlug);
     pluginNameInstance = pluginSlug.replace(/-/gi, '_');
-    pluginNameVersion = (pluginNameInstance + '_VERSION').toUpperCase();
+    pluginNameUppercase = (pluginNameInstance).toUpperCase();
     pluginAuthorFull = pluginAuthor + ' <' + pluginAuthorEmail + '>';
 
     destination =
@@ -121,7 +122,7 @@ app
         replace({
           regex: 'WordPress Plugin Boilerplate',
           replacement: pluginName,
-          paths: [destination + '/' + pluginSlug + '/' + pluginSlug + '.php'],
+          paths: [destination + '/' + pluginSlug],
           recursive: true,
           silent: true
         });
@@ -180,10 +181,10 @@ app
           silent: true
         });
 
-        //find Plugin Version
+        //find Plugin Name Uppercase
         replace({
-          regex: 'PLUGIN_NAME_VERSION',
-          replacement: pluginNameVersion,
+          regex: 'PLUGIN_NAME',
+          replacement: pluginNameUppercase,
           paths: [destination + '/' + pluginSlug],
           recursive: true,
           silent: true
@@ -192,7 +193,7 @@ app
         replace({
           regex: 'plugin_name',
           replacement: pluginNameInstance,
-          paths: [destination + '/' + pluginSlug + '/' + pluginSlug + '.php'],
+          paths: [destination + '/' + pluginSlug],
           recursive: true,
           silent: true
         });
@@ -249,15 +250,16 @@ var getSourceCode = function() {
     ref: 'master'
   };
 
-  var destination = process.cwd() + '/source/';
 
   //DELETE OLD CODE
-  rimraf(destination, function() {});
+  rimraf(origin, function() {});
 
   //GET THE NEW CODE FORM THE REPO
-  ghdownload(repo, destination)
+  
+  ghdownload(repo, origin)
     .on('zip', function(zipUrl) {
       console.log('zip: ' + zipUrl);
+      console.log('origin: ' + origin);
     })
 
     .on('error', function(err) {
@@ -265,8 +267,9 @@ var getSourceCode = function() {
     })
 
     .on('end', function() {
-      console.log('Finish Github Download ');
+      console.log('Finish Github Download to '  + origin);
     });
+
 };
 
 /**

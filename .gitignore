@@ -1,5 +1,5 @@
 node_modules
 tmp
-source
+source*
 npm-debug.log
 .idea
