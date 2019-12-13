@@ -18,6 +18,7 @@ var EasyZip = require('easy-zip').EasyZip;
 var CronJob = require('cron').CronJob;
 var ua = require('universal-analytics');
 
+
 app.set('port', port);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -26,21 +27,13 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app
-  .route(
-    '/.well-known/acme-challenge/miU-q9A8ox1btoayRB8tM6wcWPisl42aR4wnixiK2UU'
-  )
-  .get(function(req, res) {
-    res.send(
-      'miU-q9A8ox1btoayRB8tM6wcWPisl42aR4wnixiK2UU.9s9UoMhX5iRzhJpZG6oAd-7PRFIBTPxbwd7nVTPfGcM'
-    );
-  });
-
-app
   .route('/')
   //GET REQUEST DRAW THE HOME PAGE
   .get(function(req, res) {
-    res.send('Please visit <a href="https://wppb.me">https://wppb.me</a>');
-    //res.redirect('https://wppb.me');
+    const fileHTML = fs.readFileSync('index.html');
+  
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(fileHTML);
   }) // END GET ROUTE
 
   .post(function(req, res) {
@@ -58,10 +51,10 @@ app
     var pluginNameVersion = '';
     var destination = '';
     var data = req.body;
-    var visitor = ua('UA-56742268-1');
+    // var visitor = ua('UA-56742268-1');
 
     //Track Event
-    visitor.event('build', 'click', 'download', 1).send();
+    // visitor.event('build', 'click', 'download', 1).send();
     // ALL FIELDS REQUIRED IF EMPTY SET DEFAULT VALUES
     pluginSlug = String(data.slug).length
       ? String(data.slug).toLowerCase()
@@ -251,7 +244,7 @@ clean.start();
  */
 var getSourceCode = function() {
   var repo = {
-    user: 'DevinVinson',
+    user: 'itsimplycom',
     repo: 'WordPress-Plugin-Boilerplate',
     ref: 'master'
   };
